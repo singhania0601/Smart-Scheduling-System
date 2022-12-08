@@ -1,0 +1,51 @@
+version: '1.0'
+name: 'scheduling-system'
+
+services:
+  server:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    image:  keravnahar/scheduling-system:server
+    container_name: smart-node-backend
+    command: npm run serve
+    volumes:
+      - ./:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - "5000:5000"
+    env_file: ./.env
+    environment:
+      - NODE_ENV=development
+    networks:
+      - app-network
+
+      
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    image:  keravnahar/scheduling-system:client
+    container_name: smart-react-client
+    command: npm start
+    volumes:
+      - ./client/:/usr/app
+      - /usr/app/node_modules
+    depends_on:
+      - server
+    ports:
+      - "3000:3000"
+    networks:
+      - app-network
+    stdin_open: true
+    tty: true
+
+networks:
+    app-network:
+        driver: bridge
+
+volumes:
+    data-volume:
+    node_modules:
+    web-root:
+      driver: local
